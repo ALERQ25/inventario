@@ -1,0 +1,111 @@
+<div class="container">
+  <div class="header">
+    <h1>🏪 Sistema de Inventario</h1>
+    <p>FastAPI + Angular + PostgreSQL</p>
+  </div>
+
+  <div class="content">
+    <div class="form-container">
+      <h2>{{ editando ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+      
+      <div *ngIf="errores.length > 0" class="error-message">
+        <strong>⚠️ Errores de validación:</strong>
+        <ul class="error-list">
+          <li *ngFor="let error of errores">{{ error }}</li>
+        </ul>
+      </div>
+
+      <form (ngSubmit)="guardarProducto()">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Código *</label>
+            <input type="text" [(ngModel)]="productoForm.codigo" name="codigo" 
+                   [disabled]="editando" required maxlength="50" placeholder="PROD001">
+          </div>
+
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input type="text" [(ngModel)]="productoForm.nombre" name="nombre" 
+                   required maxlength="200" placeholder="Nombre del producto">
+          </div>
+
+          <div class="form-group">
+            <label>Categoría</label>
+            <input type="text" [(ngModel)]="productoForm.categoria" name="categoria" 
+                   maxlength="100" placeholder="Electrónica, Accesorios, etc.">
+          </div>
+
+          <div class="form-group">
+            <label>Cantidad *</label>
+            <input type="number" [(ngModel)]="productoForm.cantidad" name="cantidad" 
+                   required min="0" placeholder="0">
+          </div>
+
+          <div class="form-group">
+            <label>Precio *</label>
+            <input type="number" [(ngModel)]="productoForm.precio" name="precio" 
+                   required min="0.01" step="0.01" placeholder="0.00">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea [(ngModel)]="productoForm.descripcion" name="descripcion" 
+                    placeholder="Descripción detallada del producto..."></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelar()" 
+                  *ngIf="editando">Cancelar</button>
+          <button type="submit" class="btn btn-primary">
+            {{ editando ? '💾 Actualizar' : '➕ Crear' }} Producto
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="table-container">
+      <table *ngIf="productos.length > 0">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let producto of productos">
+            <td><strong>{{ producto.codigo }}</strong></td>
+            <td>{{ producto.nombre }}</td>
+            <td>{{ producto.categoria || 'Sin categoría' }}</td>
+            <td>
+              <span [class]="'badge ' + obtenerEstadoStock(producto.cantidad)">
+                {{ producto.cantidad }}
+              </span>
+            </td>
+            <td>${{ producto.precio | number:'1.2-2' }}</td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn btn-warning btn-sm" (click)="editarProducto(producto)">
+                  ✏️ Editar
+                </button>
+                <button class="btn btn-danger btn-sm" (click)="eliminarProducto(producto.id!)">
+                  🗑️ Eliminar
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="productos.length === 0" class="empty-state">
+        <div class="empty-state-icon">📦</div>
+        <h3>No hay productos en el inventario</h3>
+        <p>Comienza agregando tu primer producto usando el formulario arriba</p>
+      </div>
+    </div>
+  </div>
+</div>

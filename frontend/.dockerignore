@@ -1,0 +1,12 @@
+node_modules
+dist
+.git
+.gitignore
+*.md
+.vscode
+.angular
+coverage
+.env
+npm-debug.log
+yarn-error.log
+.editorconfig
