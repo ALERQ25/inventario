@@ -1,4 +1,1 @@
 # inventario
-# inventario
-# inventario
-# inventario
