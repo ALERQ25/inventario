@@ -1,3 +1,4 @@
+// src/app/components/producto-list/producto-list.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -56,7 +57,7 @@ export class ProductoListComponent implements OnInit {
 
     // Caso 1: Sin conexión al servidor
     if (error.status === 0) {
-      this.errores.push('❌ No se puede conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:46451');
+      this.errores.push('❌ No se puede conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:8000');
       return;
     }
 
@@ -126,7 +127,13 @@ export class ProductoListComponent implements OnInit {
     this.cargando = true;
     
     if (this.editando && this.productoForm.id) {
-      this.productoService.actualizarProducto(this.productoForm.id, this.productoForm).subscribe({
+  // ✅ Asegurarse de que id existe
+  const productoId = this.productoForm.id;
+  
+  this.productoService.actualizarProducto(
+    productoId,
+    this.productoForm
+  ).subscribe({
         next: () => {
           this.cargarProductos();
           this.cancelar();
@@ -161,8 +168,8 @@ export class ProductoListComponent implements OnInit {
   }
 
   eliminarProducto(id: number) {
-    if (confirm('¿Estás seguro de eliminar este producto?')) {
-      this.productoService.eliminarProducto(id).subscribe({
+  if (confirm('¿Estás seguro de eliminar este producto?')) {
+    this.productoService.eliminarProducto(id).subscribe({
         next: () => {
           this.cargarProductos();
           alert('✅ Producto eliminado correctamente');

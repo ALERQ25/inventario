@@ -1,22 +1,20 @@
-version: '3.8'
-
 services:
-  db:
+  inventario_db:
     image: postgres:15-alpine
     container_name: inventario_db
     environment:
-      POSTGRES_DB: inventario
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin123
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    #ports:
+     # - "5432:5432"#
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - inventario_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d inventario"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -26,16 +24,19 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: inventario_backend
+    env_file:
+      - .env
     environment:
-      DB_HOST: db
+      DB_HOST: inventario_db
       DB_PORT: 5432
-      DB_NAME: inventario
-      DB_USER: admin
-      DB_PASSWORD: admin123
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_URL: ${DATABASE_URL}
     ports:
-      - "46451:8000"
+      - "8000:8000"
     depends_on:
-      db:
+      inventario_db:
         condition: service_healthy
     networks:
       - inventario_network
@@ -48,7 +49,7 @@ services:
       dockerfile: Dockerfile
     container_name: inventario_frontend
     ports:
-      - "4200:80"
+      - "4201:80"
     depends_on:
       - backend
     networks:
