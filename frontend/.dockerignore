@@ -10,3 +10,5 @@ coverage
 npm-debug.log
 yarn-error.log
 .editorconfig
+venv/
+__pycache__/

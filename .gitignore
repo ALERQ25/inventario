@@ -1,0 +1,18 @@
+ Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.env
+
+# Angular
+frontend/node_modules/
+frontend/.angular/
+frontend/dist/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store

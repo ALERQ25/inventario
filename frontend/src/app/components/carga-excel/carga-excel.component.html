@@ -1,154 +1,256 @@
-<div class="container">
+<!-- carga-excel.component.html -->
+<div class="container mt-4">
   <div class="card">
-    <div class="card-header">
-      <h2>📊 Carga Masiva de Productos desde Excel</h2>
+    <!-- ✅ HEADER CON BOTÓN AL DASHBOARD -->
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <h3 class="mb-0">
+        <i class="bi bi-file-earmark-excel"></i> Carga Masiva de Productos desde Excel
+      </h3>
+      <button class="btn btn-light btn-sm" routerLink="/dashboard">
+        <i class="bi bi-graph-up"></i> Ver Dashboard
+      </button>
     </div>
-    
+
     <div class="card-body">
-      
       <!-- Instrucciones -->
       <div class="alert alert-info">
-        <h4>📋 Instrucciones:</h4>
-        <ol>
+        <h5><i class="bi bi-info-circle"></i> Instrucciones:</h5>
+        <ol class="mb-0">
           <li>El archivo debe ser Excel (.xlsx o .xls)</li>
           <li>Tamaño máximo: 10 MB</li>
           <li>Columnas requeridas: <strong>codigo, nombre, cantidad, precio</strong></li>
           <li>Columnas opcionales: <strong>descripcion, categoria</strong></li>
           <li>Si el código ya existe, se actualizará el producto</li>
         </ol>
-        <button class="btn btn-secondary btn-sm" (click)="descargarPlantilla()">
-          📥 Descargar Plantilla CSV
+        <button class="btn btn-sm btn-outline-primary mt-2" (click)="descargarPlantilla()">
+          <i class="bi bi-download"></i> Descargar Plantilla CSV
         </button>
       </div>
 
-      <!-- Selección de archivo -->
-      <div class="file-upload">
-        <label for="fileInput" class="file-label">
-          <span class="file-icon">📁</span>
-          <span *ngIf="!nombreArchivo">Seleccionar archivo Excel</span>
-          <span *ngIf="nombreArchivo">{{ nombreArchivo }}</span>
-        </label>
-        <input 
-          type="file" 
-          id="fileInput" 
-          accept=".xlsx,.xls"
-          (change)="onFileSelected($event)"
-          class="file-input"
-        >
+      <!-- Mensajes de error -->
+      <div class="alert alert-danger alert-dismissible fade show" *ngIf="mensajeError" role="alert">
+        <i class="bi bi-x-circle"></i> {{ mensajeError }}
+        <button type="button" class="btn-close" (click)="limpiarMensajes()" aria-label="Close"></button>
+      </div>
+
+      <!-- Mensajes de éxito -->
+      <div class="alert alert-success alert-dismissible fade show" *ngIf="mensajeExito" role="alert">
+        <i class="bi bi-check-circle"></i> {{ mensajeExito }}
+        <button type="button" class="btn-close" (click)="limpiarMensajes()" aria-label="Close"></button>
+      </div>
+
+      <!-- Mensajes de advertencia -->
+      <div class="alert alert-warning alert-dismissible fade show" *ngIf="mensajeAdvertencia" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> {{ mensajeAdvertencia }}
+        <button type="button" class="btn-close" (click)="limpiarMensajes()" aria-label="Close"></button>
+      </div>
+
+      <!-- Área de carga de archivo -->
+      <div class="upload-area mb-4">
+        <div class="mb-3">
+          <label for="inputArchivo" class="form-label">
+            Seleccionar Archivo Excel
+          </label>
+          <input type="file" class="form-control" id="inputArchivo" accept=".xlsx,.xls"
+            (change)="onFileSelected($event)" [disabled]="validando || cargando">
+        </div>
+
+        <!-- Archivo seleccionado -->
+        <div class="selected-file" *ngIf="nombreArchivo">
+          <div class="card bg-light">
+            <div class="card-body d-flex justify-content-between align-items-center">
+              <div>
+                <i class="bi bi-file-earmark-excel text-success fs-3"></i>
+                <span class="ms-2">{{ nombreArchivo }}</span>
+              </div>
+              <button class="btn btn-sm btn-outline-danger" (click)="limpiarFormulario()"
+                [disabled]="validando || cargando">
+                <i class="bi bi-trash"></i> Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ BARRA DE PROGRESO DE VALIDACIÓN -->
+        <div *ngIf="validando" class="progress-container mt-3">
+          <div class="card border-warning">
+            <div class="card-body">
+              <h6 class="text-warning mb-3">
+                <i class="bi bi-hourglass-split"></i> Validando archivo...
+              </h6>
+
+              <div class="progress-bar">
+                <div class="progress-fill progress-animated" style="width: 100%;">
+                  <span>Verificando estructura y datos...</span>
+                </div>
+              </div>
+
+              <div class="text-center mt-2">
+                <div class="spinner-border spinner-border-sm text-warning me-2" role="status"></div>
+                <small class="text-muted">Por favor espera mientras validamos tu archivo</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ BARRA DE PROGRESO DE CARGA -->
+      <div *ngIf="cargando" class="progress-container mb-4">
+        <div class="card border-success">
+          <div class="card-body">
+            <h6 class="text-success mb-3">
+              <i class="bi bi-cloud-upload"></i> Cargando productos a la base de datos...
+            </h6>
+
+            <!-- Barra con porcentaje -->
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="progreso">
+                <span>{{ progreso }}%</span>
+              </div>
+            </div>
+
+            <div class="progress-message" *ngIf="progresoMensaje">
+              <i class="bi bi-info-circle text-primary"></i>
+              {{ progresoMensaje }}
+            </div>
+
+            <div class="text-center mt-2">
+              <div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>
+              <small class="text-muted">No cierres esta ventana hasta que termine la carga</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Resultado de validación -->
+      <div *ngIf="validacion && !validando" class="mb-4">
+        <div class="card" [ngClass]="validacion.valido ? 'border-success' : 'border-danger'">
+          <div class="card-header" [ngClass]="validacion.valido ? 'bg-success text-white' : 'bg-danger text-white'">
+            <h6 class="mb-0">
+              <i [class]="validacion.valido ? 'bi bi-check-circle-fill' : 'bi bi-x-circle-fill'"></i>
+              Resultado de Validación
+            </h6>
+          </div>
+          <div class="card-body">
+            <p><strong>Total de filas:</strong> {{ validacion.total_filas }}</p>
+
+            <!-- Errores -->
+            <div *ngIf="validacion.errores.length > 0" class="mb-3">
+              <h6 class="text-danger">
+                <i class="bi bi-exclamation-triangle"></i>
+                Errores ({{ validacion.errores.length }}):
+              </h6>
+              <ul class="small text-danger mb-0">
+                <li *ngFor="let error of validacion.errores">{{ error }}</li>
+              </ul>
+            </div>
+
+            <!-- Advertencias -->
+            <div *ngIf="validacion.advertencias && validacion.advertencias.length > 0">
+              <h6 class="text-warning">
+                <i class="bi bi-exclamation-circle"></i> Advertencias:
+              </h6>
+              <ul class="small text-warning mb-0">
+                <li *ngFor="let advertencia of validacion.advertencias">{{ advertencia }}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Botones de acción -->
-      <div class="actions" *ngIf="archivoSeleccionado">
-        <button 
-          class="btn btn-primary" 
-          (click)="validarArchivo()"
-          [disabled]="validando || cargando"
-        >
-          <span *ngIf="!validando">🔍 Validar Archivo</span>
-          <span *ngIf="validando">⏳ Validando...</span>
+      <div class="d-flex gap-2">
+        <button class="btn btn-success" (click)="cargarDatos()"
+          [disabled]="!validacion?.valido || validando || cargando">
+          <span *ngIf="!cargando">
+            <i class="bi bi-upload"></i> Cargar a Base de Datos
+          </span>
+          <span *ngIf="cargando">
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+            Cargando...
+          </span>
         </button>
 
-        <button 
-          class="btn btn-success" 
-          (click)="cargarArchivo()"
-          [disabled]="!validacion?.valido || cargando || validando"
-        >
-          <span *ngIf="!cargando">✅ Cargar a Base de Datos</span>
-          <span *ngIf="cargando">⏳ Cargando...</span>
-        </button>
-
-        <button 
-          class="btn btn-secondary" 
-          (click)="limpiar()"
-          [disabled]="cargando || validando"
-        >
-          🗑️ Limpiar
+        <button class="btn btn-secondary" (click)="limpiarFormulario()" [disabled]="validando || cargando">
+          <i class="bi bi-x-circle"></i> Limpiar
         </button>
       </div>
 
-      <!-- Resultado de validación -->
-      <div *ngIf="validacion" class="validation-result">
-        
-        <!-- Validación exitosa -->
-        <div *ngIf="validacion.valido" class="alert alert-success">
-          <h4>✅ Validación Exitosa</h4>
-          <p><strong>Total de filas:</strong> {{ validacion.total_filas }}</p>
-          
-          <div *ngIf="validacion.advertencias.length > 0">
-            <h5>⚠️ Advertencias:</h5>
-            <ul>
-              <li *ngFor="let adv of validacion.advertencias">{{ adv }}</li>
-            </ul>
+      <!-- ✅ RESULTADO DE CARGA CON BOTÓN AL DASHBOARD -->
+      <div *ngIf="resultado && !cargando" class="result mt-4">
+        <div class="card border-success">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+              <i class="bi bi-check-circle-fill"></i> Carga Completada
+            </h5>
           </div>
-        </div>
+          <div class="card-body">
+            <div class="row text-center mb-3">
+              <div class="col-md-4">
+                <h3 class="text-success">{{ resultado.productos_creados }}</h3>
+                <p class="text-muted">Productos Creados</p>
+              </div>
+              <div class="col-md-4">
+                <h3 class="text-info">{{ resultado.productos_actualizados }}</h3>
+                <p class="text-muted">Productos Actualizados</p>
+              </div>
+              <div class="col-md-4">
+                <h3 class="text-primary">{{ resultado.total_procesados }}</h3>
+                <p class="text-muted">Total Procesados</p>
+              </div>
+            </div>
 
-        <!-- Validación con errores -->
-        <div *ngIf="!validacion.valido" class="alert alert-danger">
-          <h4>❌ Errores de Validación</h4>
-          <p><strong>Total de filas:</strong> {{ validacion.total_filas }}</p>
-          <h5>Errores encontrados:</h5>
-          <ul>
-            <li *ngFor="let error of validacion.errores">{{ error }}</li>
-          </ul>
-        </div>
-
-        <!-- Vista previa de datos -->
-        <div *ngIf="mostrarVistaPrevia" class="preview">
-          <h4>👁️ Vista Previa (Primeras 5 filas):</h4>
-          <div class="table-responsive">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Código</th>
-                  <th>Nombre</th>
-                  <th>Descripción</th>
-                  <th>Cantidad</th>
-                  <th>Precio</th>
-                  <th>Categoría</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let producto of validacion.datos_previos">
-                  <td>{{ producto.codigo }}</td>
-                  <td>{{ producto.nombre }}</td>
-                  <td>{{ producto.descripcion }}</td>
-                  <td>{{ producto.cantidad }}</td>
-                  <td>{{ producto.precio | number:'1.2-2' }}</td>
-                  <td>{{ producto.categoria }}</td>
-                </tr>
-              </tbody>
-            </table>
+            <!-- Botones -->
+            <div class="text-center">
+              <button class="btn btn-primary me-2" routerLink="/dashboard">
+                <i class="bi bi-graph-up"></i> Ver Dashboard
+              </button>
+              <button class="btn btn-outline-secondary" (click)="limpiarFormulario()">
+                <i class="bi bi-arrow-clockwise"></i> Cargar Otro Archivo
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Barra de progreso -->
-      <div *ngIf="cargando" class="progress-container">
-        <h4>⏳ Cargando productos...</h4>
-        <div class="progress-bar">
-          <div class="progress-fill" [style.width.%]="progreso">
-            {{ progreso }}%
-          </div>
+      <!-- Preview de datos -->
+      <div class="mt-4" *ngIf="datosTemporales && datosTemporales.length > 0">
+        <h5>Vista previa (primeros 5 registros):</h5>
+        <div class="table-responsive">
+          <table class="table table-striped table-sm">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Descripción</th>
+                <th>Categoría</th>
+              </tr>
+            </thead>
+            <!-- SOLO PARA PRUEBAS - Agregar en el HTML -->
+            <!--<button class="btn btn-warning" (click)="simularProgreso()">
+              🧪 Simular Progreso (TEST)
+            </button>-->
+            <tbody>
+              <tr *ngFor="let producto of datosTemporales.slice(0, 5)">
+                <td>{{ producto.codigo }}</td>
+                <td>{{ producto.nombre }}</td>
+                <td>
+                  <span class="badge" [ngClass]="getBadgeClass(producto.cantidad)">
+                    {{ producto.cantidad }}
+                  </span>
+                </td>
+                <td>{{ formatearPrecio(producto.precio) }}</td>
+                <td>{{ producto.descripcion || '-' }}</td>
+                <td>{{ producto.categoria || '-' }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="text-muted" *ngIf="datosTemporales.length > 5">
+            ... y {{ datosTemporales.length - 5 }} registros más
+          </p>
         </div>
-        <p class="progress-message">{{ progresoMensaje }}</p>
       </div>
-
-      <!-- Resultado de carga -->
-      <div *ngIf="resultado" class="result">
-        <div class="alert" [ngClass]="resultado.success ? 'alert-success' : 'alert-danger'">
-          <h4>{{ resultado.mensaje }}</h4>
-          <p><strong>Exitosos:</strong> {{ resultado.exitosos }}</p>
-          <p><strong>Fallidos:</strong> {{ resultado.fallidos }}</p>
-          
-          <div *ngIf="resultado.errores && resultado.errores.length > 0">
-            <h5>Errores:</h5>
-            <ul>
-              <li *ngFor="let error of resultado.errores">{{ error }}</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
 </div>
