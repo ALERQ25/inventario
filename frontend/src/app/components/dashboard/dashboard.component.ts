@@ -46,7 +46,7 @@ interface GraficaDistribucionPrecios {
     standalone: true,
     imports: [CommonModule],
     templateUrl: './dashboard.component.html',
-    styleUrls: ['./dashboard.component.css']
+    styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
     // Estadísticas
@@ -136,14 +136,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
                             label: 'Productos por Categoría',
                             data: datos.cantidades,
                             backgroundColor: [
-                                '#FF6384',
-                                '#36A2EB',
-                                '#FFCE56',
-                                '#4BC0C0',
-                                '#9966FF',
-                                '#FF9F40',
-                                '#FF6384',
-                                '#C9CBCF'
+                                '#3b82f6',  // Azul
+                                '#10b981',  // Verde
+                                '#ff053bff',  // Ámbar
+                                '#06b6d4',  // Cyan
+                                '#8b5cf6',  // Violeta
+                                '#aa0c5bff',  // Rosa
+                                '#ef4444',  // Rojo
+                                '#043375ff'
                             ],
                             borderWidth: 2,
                             borderColor: '#fff'
@@ -207,7 +207,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                             label: 'Cantidad en Stock',
                             data: datos.cantidades,
                             backgroundColor: datos.cantidades.map((cantidad: number) =>
-                                cantidad === 0 ? '#dc3545' : cantidad < 5 ? '#ffc107' : '#fd7e14'
+                                cantidad === 0 ? '#d61024ff' : cantidad < 5 ? '#b36207ff' : '#089e08ff'
                             ),
                             borderColor: '#fff',
                             borderWidth: 1
@@ -281,8 +281,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
                         datasets: [{
                             label: 'Valor Total ($)',
                             data: datos.valores,
-                            backgroundColor: '#28a745',
-                            borderColor: '#fff',
+                            backgroundColor: '#14bd3cff',
+                            borderColor: '#ffffffff',
                             borderWidth: 1
                         }]
                     },

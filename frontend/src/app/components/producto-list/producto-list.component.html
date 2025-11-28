@@ -65,7 +65,37 @@
     </div>
 
     <div class="table-container">
-      <table *ngIf="productos.length > 0">
+      <!-- ===== BUSCADOR DE PRODUCTOS ===== -->
+    <div class="search-container">
+      <div class="search-box">
+        <div class="search-icon">
+          <i class="bi bi-search"></i>
+        </div>
+        <input 
+          type="text" 
+          class="search-input"
+          [(ngModel)]="terminoBusqueda"
+          (input)="buscar()"
+          placeholder="Buscar por código, nombre, descripción o categoría..."
+          maxlength="100">
+        <button 
+          *ngIf="terminoBusqueda" 
+          class="search-clear"
+          (click)="limpiarBusqueda()"
+          title="Limpiar búsqueda">
+          <i class="bi bi-x-circle-fill"></i>
+        </button>
+      </div>
+      <div class="search-info" *ngIf="terminoBusqueda">
+        <span class="badge badge-info">
+          {{ productosFiltrados.length }} resultado(s) encontrado(s)
+        </span>
+      </div>
+    </div>
+
+    <div class="table-container">
+          <table *ngIf="productosFiltrados.length > 0">
+
         <thead>
           <tr>
             <th>Código</th>
@@ -77,7 +107,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let producto of productos">
+          <tr *ngFor="let producto of obtenerProductosPaginados()">
             <td><strong>{{ producto.codigo }}</strong></td>
             <td>{{ producto.nombre }}</td>
             <td>{{ producto.categoria || 'Sin categoría' }}</td>
@@ -101,11 +131,59 @@
         </tbody>
       </table>
 
-      <div *ngIf="productos.length === 0" class="empty-state">
+      <!-- ===== CONTROLES DE PAGINACIÓN ===== -->
+      <div class="pagination-container" *ngIf="productosFiltrados.length > productosPorPagina">
+
+        <div class="pagination-info">
+          Mostrando 
+          <strong>{{ (paginaActual - 1) * productosPorPagina + 1 }}</strong> 
+          a 
+          <strong>{{ Math.min(paginaActual * productosPorPagina, productos.length) }}</strong> 
+          de 
+          <strong>{{ productos.length }}</strong> 
+          productos
+        </div>
+
+        <div class="pagination-controls">
+          <!-- Botón Anterior -->
+          <button 
+            class="btn-pagination" 
+            (click)="cambiarPagina(paginaActual - 1)"
+            [disabled]="paginaActual === 1">
+            ← Anterior
+          </button>
+
+          <!-- Números de página -->
+          <button 
+            *ngFor="let pagina of obtenerRangoPaginas()"
+            class="btn-pagination"
+            [class.active]="pagina === paginaActual"
+            (click)="cambiarPagina(pagina)">
+            {{ pagina }}
+          </button>
+
+          <!-- Botón Siguiente -->
+          <button 
+            class="btn-pagination" 
+            (click)="cambiarPagina(paginaActual + 1)"
+            [disabled]="paginaActual === totalPaginas">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+
+<div *ngIf="productosFiltrados.length === 0 && !terminoBusqueda" class="empty-state">
         <div class="empty-state-icon">📦</div>
         <h3>No hay productos en el inventario</h3>
         <p>Comienza agregando tu primer producto usando el formulario arriba</p>
       </div>
-    </div>
-  </div>
+
+      <div *ngIf="productosFiltrados.length === 0 && terminoBusqueda" class="empty-state">
+        <div class="empty-state-icon">🔍</div>
+        <h3>No se encontraron productos</h3>
+        <p>No hay productos que coincidan con "{{ terminoBusqueda }}"</p>
+        <button class="btn btn-secondary" (click)="limpiarBusqueda()">
+          <i class="bi bi-arrow-counterclockwise"></i> Limpiar búsqueda
+        </button>
+      </div>
 </div>
