@@ -9,7 +9,7 @@ import { ProductoService, ValidacionExcel, ResultadoCarga } from '../../services
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './carga-excel.component.html',
-  styleUrls: ['./carga-excel.component.css']
+  styleUrls: ['./carga-excel.component.scss']
 })
 export class CargaExcelComponent implements OnDestroy {
   archivoSeleccionado: File | null = null;

@@ -8,7 +8,8 @@ import { ProductoService, Producto } from '../../services/producto.service';
   selector: 'app-producto-list',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './producto-list.component.html'
+  templateUrl: './producto-list.component.html',
+  styleUrls: ['./producto-list.component.scss']  // ← AGREGAR ESTA LÍNEA
 })
 export class ProductoListComponent implements OnInit {
   productos: Producto[] = [];
@@ -16,6 +17,13 @@ export class ProductoListComponent implements OnInit {
   editando = false;
   errores: string[] = [];
   cargando = false;
+  paginaActual = 1;              
+  productosPorPagina = 5;        
+  totalPaginas = 0; 
+  Math = Math;
+
+  terminoBusqueda = '';
+  productosFiltrados: Producto[] = [];
 
   constructor(private productoService: ProductoService) {}
 
@@ -34,11 +42,12 @@ export class ProductoListComponent implements OnInit {
     };
   }
 
-  cargarProductos() {
+    cargarProductos() {
     this.cargando = true;
     this.productoService.obtenerProductos().subscribe({
       next: (data) => {
         this.productos = data;
+        this.aplicarFiltros();  // ← AGREGAR ESTA LÍNEA
         this.cargando = false;
       },
       error: (error) => {
@@ -54,6 +63,8 @@ export class ProductoListComponent implements OnInit {
     console.log('Error.error.detail:', error.error?.detail);
     
     this.errores = [];
+    
+    
 
     // Caso 1: Sin conexión al servidor
     if (error.status === 0) {
@@ -77,6 +88,8 @@ export class ProductoListComponent implements OnInit {
       this.errores.push(`⚠️ ${error.error.detail}`);
       return;
     }
+
+    
 
     // Caso 4: Error 404
     if (error.status === 404) {
@@ -193,5 +206,68 @@ export class ProductoListComponent implements OnInit {
     if (cantidad === 0) return 'badge-danger';
     if (cantidad < 10) return 'badge-warning';
     return 'badge-success';
+  }
+
+  // ===== MÉTODOS DE PAGINACIÓN =====
+  
+  calcularTotalPaginas(): void {
+      // Usar productos filtrados en lugar de todos los productos
+      this.totalPaginas = Math.ceil(this.productosFiltrados.length / this.productosPorPagina);
+      
+      if (this.paginaActual > this.totalPaginas && this.totalPaginas > 0) {
+        this.paginaActual = this.totalPaginas;
+      }
+    }
+
+    obtenerProductosPaginados(): Producto[] {
+      const inicio = (this.paginaActual - 1) * this.productosPorPagina;
+      const fin = inicio + this.productosPorPagina;
+      
+      return this.productosFiltrados.slice(inicio, fin);
+    }
+
+  cambiarPagina(nuevaPagina: number): void {
+    if (nuevaPagina >= 1 && nuevaPagina <= this.totalPaginas) {
+      this.paginaActual = nuevaPagina;
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  obtenerRangoPaginas(): number[] {
+  
+    return Array.from({ length: this.totalPaginas }, (_, i) => i + 1);
+  }
+
+
+  // ===== MÉTODOS DE BÚSQUEDA =====
+  
+  aplicarFiltros(): void {
+    if (!this.terminoBusqueda || this.terminoBusqueda.trim() === '') {
+      this.productosFiltrados = [...this.productos];
+    } else {
+      const termino = this.terminoBusqueda.toLowerCase().trim();
+      
+      this.productosFiltrados = this.productos.filter(producto => {
+        return (
+          producto.codigo.toLowerCase().includes(termino) ||
+          producto.nombre.toLowerCase().includes(termino) ||
+          (producto.descripcion && producto.descripcion.toLowerCase().includes(termino)) ||
+          (producto.categoria && producto.categoria.toLowerCase().includes(termino))
+        );
+      });
+    }
+    
+    this.paginaActual = 1; 
+    this.calcularTotalPaginas();
+  }
+
+  buscar(): void {
+    this.aplicarFiltros();
+  }
+
+  limpiarBusqueda(): void {
+    this.terminoBusqueda = '';
+    this.aplicarFiltros();
   }
 }

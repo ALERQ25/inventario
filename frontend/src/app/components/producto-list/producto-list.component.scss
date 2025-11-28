@@ -1,0 +1,529 @@
+// =============================================
+// VARIABLES DE COLOR (Esquema sobrio y profesional)
+// =============================================
+$color-primario: #1e293b;      // Azul oscuro casi negro
+$color-secundario: #334155;    // Gris azulado oscuro
+$color-acento: #3b82f6;        // Azul brillante moderno
+$color-exito: #10b981;         // Verde esmeralda
+$color-advertencia: #f59e0b;   // Ámbar
+$color-peligro: #ef4444;       // Rojo moderno
+$color-fondo: #f8fafc;         // Gris casi blanco
+$color-blanco: #ffffff;
+$color-texto: #1e293b;
+$color-texto-secundario: #64748b;
+$color-borde: #e2e8f0;
+
+// =============================================
+// RESET Y ESTILOS GLOBALES
+// =============================================
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+// =============================================
+// CONTENEDOR PRINCIPAL
+// =============================================
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: $color-fondo;
+  min-height: 100vh;
+}
+
+// =============================================
+// ENCABEZADO MODERNO
+// =============================================
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 40px 30px;
+  background: linear-gradient(135deg, $color-primario 0%, $color-secundario 100%);
+  border-radius: 16px;
+  color: $color-blanco;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  h1 {
+    margin: 0 0 12px 0;
+    font-size: 2.8rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    position: relative;
+    z-index: 1;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: 0.85;
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
+  }
+}
+
+// =============================================
+// CONTENEDOR DE CONTENIDO (Formulario + Tabla)
+// =============================================
+.content {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 30px;
+  align-items: start;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+}
+
+// =============================================
+// FORMULARIO
+// =============================================
+.form-container {
+  background: $color-blanco;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid $color-borde;
+  position: sticky;
+  top: 20px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+
+  h2 {
+    margin: 0 0 20px 0;
+    color: $color-primario;
+    font-size: 1.4rem;
+    font-weight: 700;
+    border-bottom: 3px solid $color-acento;
+    padding-bottom: 12px;
+  }
+}
+
+.error-message {
+  background-color: #fef2f2;
+  border-left: 4px solid $color-peligro;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+
+  strong {
+    display: block;
+    margin-bottom: 8px;
+    color: $color-peligro;
+    font-weight: 600;
+  }
+
+  .error-list {
+    margin: 0;
+    padding-left: 20px;
+    
+    li {
+      margin-bottom: 5px;
+      color: #991b1b;
+    }
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  label {
+    font-weight: 600;
+    color: $color-texto;
+    margin-bottom: 6px;
+    font-size: 0.875rem;
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid $color-borde;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    transition: all 0.2s ease;
+    background-color: $color-blanco;
+    color: $color-texto;
+    font-family: inherit;
+
+    &:focus {
+      outline: none;
+      border-color: $color-acento;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    &:disabled {
+      background-color: #f1f5f9;
+      cursor: not-allowed;
+      color: $color-texto-secundario;
+    }
+
+    &::placeholder {
+      color: #94a3b8;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 75px;
+    font-family: inherit;
+  }
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+// =============================================
+// BOTONES
+// =============================================
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn-primary {
+  background-color: $color-acento;
+  color: $color-blanco;
+  &:hover:not(:disabled) { background-color: #2563eb; }
+}
+
+.btn-secondary {
+  background-color: $color-texto-secundario;
+  color: $color-blanco;
+  &:hover:not(:disabled) { background-color: #475569; }
+}
+
+.btn-warning {
+  background-color: $color-advertencia;
+  color: $color-blanco;
+  &:hover:not(:disabled) { background-color: #d97706; }
+}
+
+.btn-danger {
+  background-color: $color-peligro;
+  color: $color-blanco;
+  &:hover:not(:disabled) { background-color: #dc2626; }
+}
+
+.btn-sm {
+  padding: 7px 14px;
+  font-size: 0.8125rem;
+}
+
+// =============================================
+// BUSCADOR DE PRODUCTOS (INTEGRADO CORRECTAMENTE)
+// =============================================
+.search-container {
+  margin-bottom: 24px;
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: $color-blanco;
+  border: 2px solid $color-borde;
+  border-radius: 12px;
+  padding: 4px 4px 4px 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  &:focus-within {
+    border-color: $color-acento;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+}
+
+.search-icon {
+  color: $color-texto-secundario;
+  font-size: 1.25rem;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 12px 8px;
+  font-size: 0.9375rem;
+  color: $color-texto;
+  background: transparent;
+  
+  &::placeholder {
+    color: $color-texto-secundario;
+    opacity: 0.6;
+  }
+}
+
+.search-clear {
+  background: transparent;
+  border: none;
+  color: $color-texto-secundario;
+  font-size: 1.25rem;
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: $color-peligro;
+    background-color: rgba($color-peligro, 0.1);
+  }
+}
+
+.search-info {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge-info {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border: 1px solid $color-acento;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  &::before {
+    content: '🔍';
+    font-size: 0.875rem;
+  }
+}
+
+// =============================================
+// TABLA DE PRODUCTOS
+// =============================================
+.table-container {
+  background: $color-blanco;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid $color-borde;
+  overflow-x: auto;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      background-color: $color-primario;
+      color: $color-blanco;
+
+      th {
+        padding: 14px 16px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        
+        &:first-child { border-top-left-radius: 8px; }
+        &:last-child { border-top-right-radius: 8px; }
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid $color-borde;
+        transition: background-color 0.15s ease;
+
+        &:hover { background-color: #f8fafc; }
+        &:last-child { border-bottom: none; }
+
+        td {
+          padding: 14px 16px;
+          color: $color-texto;
+          font-size: 0.875rem;
+        }
+      }
+    }
+  }
+}
+
+// =============================================
+// PAGINACIÓN Y BADGES
+// =============================================
+.pagination-container {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 2px solid $color-borde;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.pagination-info {
+  color: $color-texto-secundario;
+  font-size: 0.875rem;
+  strong {
+    color: $color-primario;
+    font-weight: 600;
+  }
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-pagination {
+  padding: 8px 14px;
+  border: 2px solid $color-borde;
+  background-color: $color-blanco;
+  color: $color-texto;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 40px;
+
+  &:hover:not(:disabled):not(.active) {
+    background-color: $color-acento;
+    color: $color-blanco;
+    border-color: $color-acento;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background-color: #f8fafc;
+  }
+
+  &.active {
+    background-color: $color-primario;
+    color: $color-blanco;
+    border-color: $color-primario;
+    font-weight: 700;
+    cursor: default;
+  }
+}
+
+.badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: center;
+  min-width: 60px;
+}
+.badge-success { background-color: #d1fae5; color: #065f46; border: 1px solid #10b981; }
+.badge-warning { background-color: #fef3c7; color: #92400e; border: 1px solid #f59e0b; }
+.badge-danger { background-color: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
+
+.actions-cell {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+// =============================================
+// ESTADO VACÍO (Corregido: ya no envuelve al buscador)
+// =============================================
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: $color-texto-secundario;
+
+  .empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.4;
+  }
+
+  h3 {
+    margin: 0 0 10px 0;
+    color: $color-texto;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+  
+  .btn {
+    margin-top: 16px;
+  }
+}
